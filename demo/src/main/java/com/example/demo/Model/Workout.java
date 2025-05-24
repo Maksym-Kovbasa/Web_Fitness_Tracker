@@ -11,13 +11,14 @@ import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Workout {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String type;
     private int duration;
     private int calories;
-    
+
     private LocalDate date;
 
     @ManyToOne
