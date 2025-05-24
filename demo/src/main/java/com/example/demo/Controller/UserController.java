@@ -29,6 +29,9 @@ public class UserController {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
         }
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already exists");
+        }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole("USER");

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration Form</title>
+  <link rel="stylesheet" href="style/login.css">
+</head>
+<body>
+  <div class="wrapper">
+    <form id="registerForm">
+      <h2>Registration Form</h2>
+      <div class="input-field">
+        <input type="text" name="username" required>
+        <label>Enter your username</label>
+      </div>
+      <div class="input-field">
+        <input type="password" name="password" required>
+        <label>Enter your password</label>
+      </div>
+      <div class="input-field">
+        <input type="email" name="email" required>
+        <label>Enter your email</label>
+      </div>
+      <button type="submit">Register</button>
+      <div class="register">
+        <p>Already have an account? <a href="login.html">Login</a></p>
+      </div>
+      <div id="result" style="margin-top:10px;color:#d00;"></div>
+    </form>
+  </div>
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        username: form.username.value,
+        password: form.password.value,
+        email: form.email.value
+      };
+      const response = await fetch('/api/users/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const text = await response.text();
+      document.getElementById('result').innerText = text;
+    });
+  </script>
+</body>
+</html>
