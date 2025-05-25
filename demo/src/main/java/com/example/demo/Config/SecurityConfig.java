@@ -17,34 +17,52 @@ import jakarta.servlet.http.HttpServletResponse;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(authz -> authz
-                        .requestMatchers(
-                                "/",
-                                "/index.html",
-                                "/login.html",
-                                "/style/**",
-                                "/js/**",
-                                "/images/**",
-                                "/api/users/register",
-                                "/h2-console/**")
-                        .permitAll()
-                        .anyRequest().authenticated())
-                .formLogin(form -> form
-                        .loginPage("/login.html")
-                        .loginProcessingUrl("/login")
-                        .failureHandler((request, response, exception) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.getWriter().write("Invalid username/email or password");
-                        })
-                        .permitAll());
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configure(http))
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers(
+                    "/",
+                    "/index.html",
+                    "/login.html",
+                    "/goals.html",
+                    "/workouts.html",
+                    "/style/**",
+                    "/js/**",
+                    "/images/**",
+                    "/api/users/register",
+                    "/h2-console/**"
+                ).permitAll()
+                .requestMatchers(
+                    "/api/workouts/**",
+                    "/api/goals/**",
+                    "/api/statistics/**"
+                ).authenticated()
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/login.html")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/workouts.html", true)
+                .failureHandler((request, response, exception) -> {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Invalid username/email or password");
+                })
+                .permitAll())
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login.html")
+                .permitAll())
+            .exceptionHandling(handling -> handling
+                .authenticationEntryPoint((request, response, exception) -> {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Unauthorized");
+                }));
 
         http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 

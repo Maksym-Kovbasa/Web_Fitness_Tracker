@@ -1,9 +1,9 @@
 package com.example.demo.Model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
-import jakarta.persistence.CascadeType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "\"user\"")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,11 +25,13 @@ public class User {
 
     private String role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Workout> workouts = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    @JsonIgnoreProperties("user")
+    private Set<Goal> goals;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Goal> goals = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    @JsonIgnoreProperties("user")
+    private Set<Workout> workouts;
 
     public Long getId() {
         return id;
