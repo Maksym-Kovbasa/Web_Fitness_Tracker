@@ -15,16 +15,19 @@ import com.example.demo.Model.User;
 import com.example.demo.Model.Workout;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.Repository.WorkoutRepository;
+import com.example.demo.Service.GoalServiceInterface;
 
 @RestController
 @RequestMapping("/api/workouts")
 public class WorkoutController {
     private final WorkoutRepository workoutRepository;
     private final UserRepository userRepository;
+    private final GoalServiceInterface goalService;
 
-    public WorkoutController(WorkoutRepository workoutRepository, UserRepository userRepository) {
+    public WorkoutController(WorkoutRepository workoutRepository, UserRepository userRepository, GoalServiceInterface goalService) {
         this.workoutRepository = workoutRepository;
         this.userRepository = userRepository;
+        this.goalService = goalService;
     }
 
     @GetMapping
@@ -58,6 +61,9 @@ public class WorkoutController {
             return ResponseEntity.status(401).body("User not found");
         workout.setUser(user);
         Workout saved = workoutRepository.save(workout);
+
+        goalService.updateAllGoalsProgressForUserAndDate(user, workout.getDate());
+
         return ResponseEntity.ok(saved);
     }
 
@@ -93,9 +99,9 @@ public class WorkoutController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-
         workoutRepository.delete(workout);
 
+        goalService.updateAllGoalsProgressForUserAndDate(workout.getUser(), workout.getDate());
 
         return ResponseEntity.noContent().build();
     }
