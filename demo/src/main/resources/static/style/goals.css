@@ -1,0 +1,334 @@
+@font-face {
+    font-family: 'Nova-Round';
+    src: url("./font/Nova-round.ttf") format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nova-Round', sans-serif;
+}
+
+
+
+body {
+    background-image: url("sunset-reduced.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    position: relative;
+}
+
+body::before {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+    background-image: url("sunset-reduced.jpg");
+    z-index: -1;
+}
+
+.wrapper-add {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    margin-left: 50px;
+    transform: translateY(-50%);
+    width: 400px;
+    border-radius: 15px;
+    padding: 40px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.wrapper-list {
+    margin-left: 40%;
+    flex: 1;
+    max-width: 800px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    min-height: 20vh;
+}
+
+.wrapper-add:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+}
+
+.wrapper-list:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 25px;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+.input-field {
+    position: relative;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    margin: 20px 0;
+}
+
+.input-field label {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    color: #ffffff;
+    font-size: 16px;
+    pointer-events: none;
+    transition: 0.3s ease;
+}
+
+.input-field input {
+    width: 100%;
+    height: 40px;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #ffffff;
+    padding: 0 10px;
+}
+
+.input-field input:focus~label,
+.input-field input:valid~label {
+    font-size: 0.9rem;
+    top: 10px;
+    transform: translateY(-150%);
+    color: #ffdde1;
+}
+
+.input-field input.always-focused~label {
+    font-size: 0.9rem;
+    top: 10px;
+    transform: translateY(-150%);
+    color: #ffdde1;
+}
+
+.forget {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 25px 0 35px 0;
+    color: #ffffff;
+}
+
+#remember {
+    accent-color: #ffdde1;
+}
+
+.forget label {
+    display: flex;
+    align-items: center;
+}
+
+.forget label p {
+    margin-left: 8px;
+}
+
+.wrapper-add a {
+    color: #ffdde1;
+    text-decoration: none;
+}
+
+.wrapper-add a:hover {
+    text-decoration: underline;
+}
+
+.wrapper-list a {
+    color: #ffdde1;
+    text-decoration: none;
+}
+
+.wrapper-list a:hover {
+    text-decoration: underline;
+}
+
+button {
+    background-color: #271930;
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    padding: 15px 20px;
+    cursor: pointer;
+    border-radius: 25px;
+    font-size: 16px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    color: #000000;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #ffffff;
+}
+
+.register {
+    text-align: center;
+    margin-top: 30px;
+    color: #ffffff;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+.progress {
+    height: 100%;
+    background-color: #4CAF50;
+    border-radius: 10px;
+    transition: width 0.3s ease-in-out;
+}
+
+.goal-card {
+    margin-bottom: 0;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.wrapper-list .goal-card {
+    padding: 20px;
+}
+
+.goal-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.goal-card p {
+    margin: 5px 0;
+}
+
+.progress-bar {
+    margin-top: 8px;
+    height: 6px;
+}
+
+.list-goal {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    padding: 15px;
+    position: relative;
+    margin: 0 auto;
+    width: 100%;
+    min-height: 300px;
+}
+
+.list-goal h2 {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    z-index: 10;
+    color: #ffffff;
+    font-size: 2rem;
+    letter-spacing: 1px;
+    justify-self: center;
+}
+
+.status-achieved {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.status-failed {
+    color: #f44336;
+    font-weight: bold;
+}
+
+.status-progress {
+    color: #2196F3;
+    font-weight: bold;
+}
+
+.error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    padding: 15px;
+    margin: 10px 0;
+    font-size: 1.4rem;
+    border-radius: 4px;
+    text-align: center;
+    grid-column: 1 / -1;
+    justify-self: center;
+    align-self: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+.goal-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    .wrapper-add {
+        position: relative;
+        transform: none;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 20px 0;
+    }
+
+    .wrapper-list {
+        margin-left: 0;
+        width: 100%;
+        min-height: auto;
+    }
+}

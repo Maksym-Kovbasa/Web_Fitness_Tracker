@@ -33,6 +33,7 @@ public class Goal {
     private LocalDate startDate;
     private LocalDate endDate;
     private String username;
+    private String status;
 
     @Column(name = "workout_progress")
     private int workoutProgress;
@@ -60,5 +61,13 @@ public class Goal {
 
     public void setWorkoutProgress(int workoutProgress) {
         this.workoutProgress = workoutProgress;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

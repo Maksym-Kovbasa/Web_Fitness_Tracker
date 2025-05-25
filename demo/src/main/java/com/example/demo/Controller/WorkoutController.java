@@ -2,8 +2,10 @@ package com.example.demo.Controller;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -80,12 +82,21 @@ public class WorkoutController {
     public ResponseEntity<?> deleteWorkout(@PathVariable Long id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        return workoutRepository.findById(id)
-                .filter(w -> w.getUser() != null && w.getUser().getUsername().equals(username))
-                .map(w -> {
-                    workoutRepository.deleteById(id);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElse(ResponseEntity.status(403).body("Forbidden"));
+
+        Optional<Workout> workoutOpt = workoutRepository.findById(id);
+        if (workoutOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Workout workout = workoutOpt.get();
+        if (workout.getUser() == null || !workout.getUser().getUsername().equals(username)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+
+        workoutRepository.delete(workout);
+
+
+        return ResponseEntity.noContent().build();
     }
 }
