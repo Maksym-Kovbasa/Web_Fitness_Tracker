@@ -24,32 +24,48 @@ public class WorkoutController {
     private final UserRepository userRepository;
     private final GoalServiceInterface goalService;
 
-    public WorkoutController(WorkoutRepository workoutRepository, UserRepository userRepository, GoalServiceInterface goalService) {
+    public WorkoutController(WorkoutRepository workoutRepository, UserRepository userRepository,
+            GoalServiceInterface goalService) {
         this.workoutRepository = workoutRepository;
         this.userRepository = userRepository;
         this.goalService = goalService;
     }
 
     @GetMapping
-    public List<Workout> getAllWorkouts(
-            @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) String type,
+    public ResponseEntity<?> getAllWorkouts(@RequestParam(required = false) String type,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        if (userId != null || type != null || date != null) {
-            return workoutRepository.findAll().stream()
-                    .filter(w -> userId == null || (w.getUser() != null && w.getUser().getId().equals(userId)))
-                    .filter(w -> type == null || w.getType().equalsIgnoreCase(type))
-                    .filter(w -> date == null || w.getDate().equals(date))
-                    .toList();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        User currentUser = userRepository.findByUsername(username).orElse(null);
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
         }
-        return workoutRepository.findAll();
+        List<Workout> userWorkouts = workoutRepository.findAll().stream()
+                .filter(w -> w.getUser() != null && w.getUser().getId().equals(currentUser.getId()))
+                .filter(w -> type == null || w.getType().equalsIgnoreCase(type))
+                .filter(w -> date == null || w.getDate().equals(date))
+                .toList();
+
+        return ResponseEntity.ok(userWorkouts);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Workout> getWorkoutById(@PathVariable Long id) {
-        return workoutRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> getWorkoutById(@PathVariable Long id) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        User currentUser = userRepository.findByUsername(username).orElse(null);
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        }
+        Optional<Workout> workoutOpt = workoutRepository.findById(id);
+        if (workoutOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Workout workout = workoutOpt.get();
+        if (workout.getUser() == null || !workout.getUser().getId().equals(currentUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied: Workout does not belong to you");
+        }
+        return ResponseEntity.ok(workout);
     }
 
     @PostMapping
@@ -57,13 +73,12 @@ public class WorkoutController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         User user = userRepository.findByUsername(username).orElse(null);
-        if (user == null)
-            return ResponseEntity.status(401).body("User not found");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        }
         workout.setUser(user);
         Workout saved = workoutRepository.save(workout);
-
         goalService.updateAllGoalsProgressForUserAndDate(user, workout.getDate());
-
         return ResponseEntity.ok(saved);
     }
 
@@ -71,38 +86,49 @@ public class WorkoutController {
     public ResponseEntity<?> updateWorkout(@PathVariable Long id, @RequestBody Workout workout) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        return workoutRepository.findById(id)
-                .filter(w -> w.getUser() != null && w.getUser().getUsername().equals(username))
-                .map(existing -> {
-                    existing.setType(workout.getType());
-                    existing.setDuration(workout.getDuration());
-                    existing.setCalories(workout.getCalories());
-                    existing.setDate(workout.getDate());
-                    workoutRepository.save(existing);
-                    return ResponseEntity.ok((Object) existing);
-                })
-                .orElse(ResponseEntity.status(403).body("Forbidden"));
+        User currentUser = userRepository.findByUsername(username).orElse(null);
+
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        }
+
+        Optional<Workout> existingWorkoutOpt = workoutRepository.findById(id);
+        if (existingWorkoutOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Workout existingWorkout = existingWorkoutOpt.get();
+
+        if (existingWorkout.getUser() == null || !existingWorkout.getUser().getId().equals(currentUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied: Workout does not belong to you");
+        }
+        existingWorkout.setType(workout.getType());
+        existingWorkout.setDuration(workout.getDuration());
+        existingWorkout.setCalories(workout.getCalories());
+        existingWorkout.setDate(workout.getDate());
+        Workout updated = workoutRepository.save(existingWorkout);
+        goalService.updateAllGoalsProgressForUserAndDate(currentUser, updated.getDate());
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteWorkout(@PathVariable Long id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-
+        User currentUser = userRepository.findByUsername(username).orElse(null);
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        }
         Optional<Workout> workoutOpt = workoutRepository.findById(id);
         if (workoutOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-
         Workout workout = workoutOpt.get();
-        if (workout.getUser() == null || !workout.getUser().getUsername().equals(username)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        if (workout.getUser() == null || !workout.getUser().getId().equals(currentUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied: Workout does not belong to you");
         }
-
         workoutRepository.delete(workout);
-
-        goalService.updateAllGoalsProgressForUserAndDate(workout.getUser(), workout.getDate());
-
+        goalService.updateAllGoalsProgressForUserAndDate(currentUser, workout.getDate());
         return ResponseEntity.noContent().build();
     }
 }

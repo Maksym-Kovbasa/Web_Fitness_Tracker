@@ -2,6 +2,8 @@ package com.example.demo.Model;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,11 +13,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@ToString(exclude = "user")
+@EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "goals")
 public class Goal {
@@ -25,49 +31,38 @@ public class Goal {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({ "goals", "workouts", "password" })
     private User user;
 
     private int goalNumber;
-    private int targetCalories;
-    private int targetWorkouts;
+    private Integer targetCalories;
+    private Integer targetWorkouts;
     private LocalDate startDate;
     private LocalDate endDate;
     private String username;
     private String status;
 
     @Column(name = "workout_progress")
-    private int workoutProgress;
+    private Double workoutProgress;
 
     public Goal(Long id, int targetCalories, int targetWorkouts, LocalDate startDate, LocalDate endDate, User user) {
-        this.id = getId();
-        this.targetCalories = getTargetCalories();
-        this.targetWorkouts = getTargetWorkouts();
-        this.startDate = getStartDate();
-        this.endDate = getEndDate();
-        this.username = getUser() != null ? getUser().getUsername() : null;
+        this.id = id;
+        this.targetCalories = targetCalories;
+        this.targetWorkouts = targetWorkouts;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.user = user;
+        this.username = user != null ? user.getUsername() : null;
     }
 
-    public int getGoalNumber() {
-        return goalNumber;
-    }
+    public Goal() {}
 
-    public void setGoalNumber(int goalNumber) {
-        this.goalNumber = goalNumber;
-    }
-
-    public int getWorkoutProgress() {
-        return workoutProgress;
-    }
-
-    public void setWorkoutProgress(int workoutProgress) {
+    public void setWorkoutProgress(double workoutProgress) {
         this.workoutProgress = workoutProgress;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public void setUser(User user) {
+        this.user = user;
+        this.username = user != null ? user.getUsername() : null;
     }
 }

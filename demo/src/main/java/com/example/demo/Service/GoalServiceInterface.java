@@ -21,4 +21,6 @@ public interface GoalServiceInterface {
     void updateAllGoalsProgressForUserAndDate(User user, LocalDate workoutDate);
 
     String getGoalStatus(Goal goal);
+
+    List<Goal> getGoalsByUser(User user);
 }

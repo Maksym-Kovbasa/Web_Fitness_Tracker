@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.Model.Goal;
 import com.example.demo.Model.User;
@@ -95,17 +96,6 @@ public class GoalService implements GoalServiceInterface {
 
         String username = auth.getName();
         return workoutRepository.countByUserUsernameAndDateBetween(username, startDate, endDate);
-    }
-
-    public String getGoalStatus(Goal goal) {
-        LocalDate now = LocalDate.now();
-        if (now.isBefore(goal.getStartDate())) {
-            return "Not Started";
-        } else if (now.isAfter(goal.getEndDate())) {
-            return goal.getWorkoutProgress() == 100 ? "Achieved!" : "Failed";
-        } else {
-            return "In Progress";
-        }
     }
 
     public Goal updateGoalProgress(Long goalId) {
@@ -236,12 +226,112 @@ public class GoalService implements GoalServiceInterface {
         return Math.min(percentage, 100);
     }
 
-    public void updateAllGoalsProgressForUserAndDate(User user, LocalDate workoutDate) {
-        List<Goal> goals = goalRepository.findByUserUsername(user.getUsername());
+    @Transactional
+    public void updateAllGoalsProgressForUserAndDate(User user, LocalDate date) {
+        List<Goal> goals = goalRepository.findByUser(user);
+
         for (Goal goal : goals) {
-            if ((workoutDate.isEqual(goal.getStartDate()) || workoutDate.isAfter(goal.getStartDate()))
-                    && (workoutDate.isEqual(goal.getEndDate()) || workoutDate.isBefore(goal.getEndDate()))) {
-                updateGoalProgress(goal.getId());
+            if ((date.isEqual(goal.getStartDate()) || date.isAfter(goal.getStartDate())) &&
+                    (date.isEqual(goal.getEndDate()) || date.isBefore(goal.getEndDate()))) {
+
+                List<Workout> workouts = workoutRepository.findByUserAndDateBetween(
+                        user, goal.getStartDate(), goal.getEndDate());
+
+                int completedWorkouts = workouts.size();
+                int targetWorkouts = goal.getTargetWorkouts();
+
+                if (targetWorkouts > 0) {
+                    double progress = ((double) completedWorkouts / targetWorkouts) * 100.0;
+                    // Обмежуємо прогрес від 0 до 100
+                    progress = Math.min(100.0, Math.max(0.0, progress));
+                    goal.setWorkoutProgress(progress);
+                } else {
+                    goal.setWorkoutProgress(0.0);
+                }
+
+                updateGoalStatus(goal);
+
+                goalRepository.save(goal);
+            }
+        }
+    }
+
+    private void updateGoalStatus(Goal goal) {
+        LocalDate now = LocalDate.now();
+        double progress = goal.getWorkoutProgress();
+
+        if (now.isAfter(goal.getEndDate())) {
+            if (progress >= 100.0) {
+                goal.setStatus("Completed");
+            } else {
+                goal.setStatus("Failed");
+            }
+        } else {
+            if (progress >= 100.0) {
+                goal.setStatus("Completed");
+            } else if (progress > 0.0) {
+                goal.setStatus("In Progress");
+            } else {
+                goal.setStatus("Not Started");
+            }
+        }
+    }
+
+    public String getGoalStatus(Goal goal) {
+        LocalDate now = LocalDate.now();
+        if (now.isBefore(goal.getStartDate())) {
+            return "Not Started";
+        } else if (now.isAfter(goal.getEndDate())) {
+            return goal.getWorkoutProgress() == 100 ? "Achieved!" : "Failed";
+        } else {
+            return "In Progress";
+        }
+    }
+
+    @Override
+    public List<Goal> getGoalsByUser(User user) {
+        return goalRepository.findByUser(user);
+    }
+
+    @Transactional
+    public void updateAllGoalsUsername() {
+        List<Goal> goals = goalRepository.findAll();
+        for (Goal goal : goals) {
+            if (goal.getUser() != null
+                    && (goal.getUsername() == null || !goal.getUsername().equals(goal.getUser().getUsername()))) {
+                goal.setUsername(goal.getUser().getUsername());
+                goalRepository.save(goal);
+            }
+        }
+    }
+
+    @Transactional
+    public void fixInvalidProgressValues() {
+        List<Goal> goals = goalRepository.findAll();
+        for (Goal goal : goals) {
+            if (goal.getWorkoutProgress() == null ||
+                    goal.getWorkoutProgress() < 0 ||
+                    goal.getWorkoutProgress() > 100) {
+
+                if (goal.getUser() != null && goal.getStartDate() != null && goal.getEndDate() != null) {
+                    List<Workout> workouts = workoutRepository.findByUserAndDateBetween(
+                            goal.getUser(), goal.getStartDate(), goal.getEndDate());
+
+                    int completedWorkouts = workouts.size();
+                    int targetWorkouts = goal.getTargetWorkouts() != null ? goal.getTargetWorkouts() : 0;
+
+                    if (targetWorkouts > 0) {
+                        double progress = ((double) completedWorkouts / targetWorkouts) * 100.0;
+                        progress = Math.min(100.0, Math.max(0.0, progress));
+                        goal.setWorkoutProgress(progress);
+                    } else {
+                        goal.setWorkoutProgress(0.0);
+                    }
+                } else {
+                    goal.setWorkoutProgress(0.0);
+                }
+
+                goalRepository.save(goal);
             }
         }
     }
