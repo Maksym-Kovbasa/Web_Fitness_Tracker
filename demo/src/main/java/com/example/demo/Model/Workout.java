@@ -34,8 +34,8 @@ public class Workout {
     private User user;
 
     private String type;
-    private int duration;
-    private int calories;
+    private Integer duration;
+    private Integer calories;
     private LocalDate date;
     private String username;
 }

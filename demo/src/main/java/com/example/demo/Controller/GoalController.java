@@ -1,6 +1,7 @@
 package com.example.demo.Controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.Model.Goal;
@@ -96,5 +98,19 @@ public class GoalController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error deleting goal: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<Goal>> getGoalsByStatus(@RequestParam("status") String status) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        List<Goal> goals = goalRepository.findByUserUsername(username);
+        
+        //(Completed, In Progress, Not Started, Failed)
+        List<Goal> filteredGoals = goals.stream()
+                .filter(goal -> goal.getStatus() != null && goal.getStatus().equalsIgnoreCase(status))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(filteredGoals);
     }
 }

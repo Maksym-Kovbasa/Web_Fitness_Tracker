@@ -112,15 +112,11 @@ public class GoalService implements GoalServiceInterface {
                 ? (totalCalories * 100) / goal.getTargetCalories()
                 : 0;
 
-        int progress = Math.min(workoutPercent, caloriesPercent);
+        int progress = (workoutPercent + caloriesPercent) / 2;
         progress = Math.min(progress, 100);
 
         goal.setWorkoutProgress(progress);
-        // Обчислення статусу цілі:
-        // Якщо поточна дата до старту – "Not Started",
-        // Якщо після кінця – "Achieved!" (якщо прогрес 100%) або "Failed",
-        // Інакше – "In Progress"
-        goal.setStatus(getGoalStatus(goal));
+        goal.setStatus(getGoalStatus(goal, workoutPercent, caloriesPercent));
         return goalRepository.save(goal);
     }
 
@@ -233,46 +229,7 @@ public class GoalService implements GoalServiceInterface {
         for (Goal goal : goals) {
             if ((date.isEqual(goal.getStartDate()) || date.isAfter(goal.getStartDate())) &&
                     (date.isEqual(goal.getEndDate()) || date.isBefore(goal.getEndDate()))) {
-
-                List<Workout> workouts = workoutRepository.findByUserAndDateBetween(
-                        user, goal.getStartDate(), goal.getEndDate());
-
-                int completedWorkouts = workouts.size();
-                int targetWorkouts = goal.getTargetWorkouts();
-
-                if (targetWorkouts > 0) {
-                    double progress = ((double) completedWorkouts / targetWorkouts) * 100.0;
-                    // Обмежуємо прогрес від 0 до 100
-                    progress = Math.min(100.0, Math.max(0.0, progress));
-                    goal.setWorkoutProgress(progress);
-                } else {
-                    goal.setWorkoutProgress(0.0);
-                }
-
-                updateGoalStatus(goal);
-
-                goalRepository.save(goal);
-            }
-        }
-    }
-
-    private void updateGoalStatus(Goal goal) {
-        LocalDate now = LocalDate.now();
-        double progress = goal.getWorkoutProgress();
-
-        if (now.isAfter(goal.getEndDate())) {
-            if (progress >= 100.0) {
-                goal.setStatus("Completed");
-            } else {
-                goal.setStatus("Failed");
-            }
-        } else {
-            if (progress >= 100.0) {
-                goal.setStatus("Completed");
-            } else if (progress > 0.0) {
-                goal.setStatus("In Progress");
-            } else {
-                goal.setStatus("Not Started");
+                updateGoalProgress(goal.getId());
             }
         }
     }
@@ -283,6 +240,20 @@ public class GoalService implements GoalServiceInterface {
             return "Not Started";
         } else if (now.isAfter(goal.getEndDate())) {
             return goal.getWorkoutProgress() == 100 ? "Achieved!" : "Failed";
+        } else {
+            return "In Progress";
+        }
+    }
+
+    public String getGoalStatus(Goal goal, int workoutPercent, int caloriesPercent) {
+        if (workoutPercent >= 100 && caloriesPercent >= 100) {
+            return "Completed";
+        }
+        LocalDate now = LocalDate.now();
+        if (now.isBefore(goal.getStartDate())) {
+            return "Not Started";
+        } else if (now.isAfter(goal.getEndDate())) {
+            return "Failed";
         } else {
             return "In Progress";
         }
@@ -309,10 +280,9 @@ public class GoalService implements GoalServiceInterface {
     public void fixInvalidProgressValues() {
         List<Goal> goals = goalRepository.findAll();
         for (Goal goal : goals) {
-            if (goal.getWorkoutProgress() == null ||
-                    goal.getWorkoutProgress() < 0 ||
-                    goal.getWorkoutProgress() > 100) {
+            boolean progressUpdated = false;
 
+            if (goal.getWorkoutProgress() == null || goal.getWorkoutProgress() < 0 || goal.getWorkoutProgress() > 100) {
                 if (goal.getUser() != null && goal.getStartDate() != null && goal.getEndDate() != null) {
                     List<Workout> workouts = workoutRepository.findByUserAndDateBetween(
                             goal.getUser(), goal.getStartDate(), goal.getEndDate());
@@ -321,18 +291,34 @@ public class GoalService implements GoalServiceInterface {
                     int targetWorkouts = goal.getTargetWorkouts() != null ? goal.getTargetWorkouts() : 0;
 
                     if (targetWorkouts > 0) {
-                        double progress = ((double) completedWorkouts / targetWorkouts) * 100.0;
-                        progress = Math.min(100.0, Math.max(0.0, progress));
-                        goal.setWorkoutProgress(progress);
+                        double workoutProgress = ((double) completedWorkouts / targetWorkouts) * 100.0;
+                        workoutProgress = Math.min(100.0, Math.max(0.0, workoutProgress));
+                        goal.setWorkoutProgress(workoutProgress);
                     } else {
                         goal.setWorkoutProgress(0.0);
                     }
+                    progressUpdated = true;
                 } else {
                     goal.setWorkoutProgress(0.0);
+                    progressUpdated = true;
                 }
-
-                goalRepository.save(goal);
             }
+            if (progressUpdated || goal.getStatus() == null) {
+                int totalCalories = calculateTotalCalories(goal.getStartDate(), goal.getEndDate());
+                int targetCalories = goal.getTargetCalories() != null ? goal.getTargetCalories() : 0;
+
+                int caloriesPercent = targetCalories > 0
+                        ? (totalCalories * 100) / targetCalories
+                        : 0;
+
+                int workoutPercent = goal.getWorkoutProgress() != null
+                        ? goal.getWorkoutProgress().intValue()
+                        : 0;
+
+                goal.setStatus(getGoalStatus(goal, workoutPercent, caloriesPercent));
+            }
+
+            goalRepository.save(goal);
         }
     }
 }
