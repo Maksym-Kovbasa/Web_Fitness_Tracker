@@ -93,11 +93,8 @@ public class StatisticsController {
         LocalDate parsedEndDate = parseDate(endDate, LocalDate.now());
         LocalDate parsedStartDate = parseDate(startDate, parsedEndDate.minusMonths(1));
 
-        if (parsedStartDate.isAfter(parsedEndDate)) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Invalid date range", "message",
-                            "Start date must be before or equal to end date"));
-        }
+
+        if (parsedEndDate.isBefore(parsedStartDate)) { throw StatisticsException.statisticsDateConflict(); }
 
         List<Workout> userWorkouts = getUserWorkouts(currentUser).stream()
                 .filter(w -> !w.getDate().isBefore(parsedStartDate) && !w.getDate().isAfter(parsedEndDate))

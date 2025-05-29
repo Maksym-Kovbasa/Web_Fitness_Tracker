@@ -23,7 +23,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "\"user\"")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "role"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler",})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,5 +1,6 @@
 package com.example.demo.Controller;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -47,24 +48,6 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-
-    // @GetMapping("/{id}")
-    // public ResponseEntity<?> getUser(@PathVariable Long id) {
-    //     if (id == null || id <= 0) { 
-    //         throw UserException.invalidUserId(id); 
-    //     }
-    //     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    //     String username = auth.getName();
-    //     User currentUser = userRepository.findByUsername(username).orElse(null);
-    //     if (currentUser == null) {
-    //         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
-    //     }
-    //     if (!currentUser.getId().equals(id)) {
-    //         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied: You can only access your own profile");
-    //     }
-    //     return ResponseEntity.ok(currentUser);
-    // }
-
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
         String username = authentication.getName();
@@ -82,5 +65,5 @@ public class UserController {
         if (user.getPassword().length() < 6) {                                   throw UserException.passwordTooShort(); }
     }
 
-    private boolean isValidEmail(String email) { return email.contains("@gmail.com") /*&& email.length() > 5*/;}
+    private boolean isValidEmail(String email) { return EmailValidator.getInstance().isValid(email); }
 }
