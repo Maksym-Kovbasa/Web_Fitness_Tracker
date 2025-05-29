@@ -1,11 +1,13 @@
 package com.example.demo.Controller;
 
+import com.example.demo.Exception.StatisticsException;
+import com.example.demo.Exception.UserException;
+import com.example.demo.Exception.WorkoutException;
 import com.example.demo.Model.User;
 import com.example.demo.Model.Workout;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.Repository.WorkoutRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,83 +28,59 @@ public class StatisticsController {
     @Autowired
     private UserRepository userRepository;
 
-
-    @ExceptionHandler(DateTimeParseException.class)
-    public ResponseEntity<?> handleDateTimeParseException(DateTimeParseException e) {
-        Map<String, Object> error = new HashMap<>();
-        error.put("error", "Invalid date format");
-        error.put("message", "Please use format YYYY-MM-DD and ensure the date is valid");
-        error.put("details", e.getMessage());
-        return ResponseEntity.badRequest().body(error);
-    }
-
     @GetMapping
     public ResponseEntity<?> getGeneralStats() {
         try {
             User currentUser = getCurrentUser();
-            if (currentUser == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
-            }
-
             List<Workout> userWorkouts = getUserWorkouts(currentUser);
 
             Map<String, Object> stats = new HashMap<>();
             stats.put("totalWorkouts", userWorkouts.size());
             stats.put("totalDuration", userWorkouts.stream().mapToInt(Workout::getDuration).sum());
             stats.put("totalCalories", userWorkouts.stream().mapToInt(Workout::getCalories).sum());
-            stats.put("averageDuration",
-                    userWorkouts.isEmpty() ? 0 : userWorkouts.stream().mapToInt(Workout::getDuration).average().orElse(0));
-            stats.put("averageCalories",
-                    userWorkouts.isEmpty() ? 0 : userWorkouts.stream().mapToInt(Workout::getCalories).average().orElse(0));
+            stats.put("averageDuration", userWorkouts.isEmpty() ? 0
+                    : userWorkouts.stream().mapToInt(Workout::getDuration).average().orElse(0));
+            stats.put("averageCalories", userWorkouts.isEmpty() ? 0
+                    : userWorkouts.stream().mapToInt(Workout::getCalories).average().orElse(0));
 
             String mostPopularType = userWorkouts.stream()
                     .collect(Collectors.groupingBy(Workout::getType, Collectors.counting()))
-                    .entrySet().stream()
-                    .max(Map.Entry.comparingByValue())
-                    .map(Map.Entry::getKey)
+                    .entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey)
                     .orElse("None");
             stats.put("mostPopularWorkoutType", mostPopularType);
 
             return ResponseEntity.ok(stats);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Internal server error", "message", e.getMessage()));
+        } catch (Exception ex) {
+            throw StatisticsException.feiledGeneralstats(ex.getMessage());
         }
     }
 
     @GetMapping("/workouts/by-type")
     public ResponseEntity<?> getWorkoutStatsByType() {
-        try {
-            User currentUser = getCurrentUser();
-            if (currentUser == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
-            }
-
-            List<Workout> userWorkouts = getUserWorkouts(currentUser);
-
-            Map<String, Map<String, Object>> statsByType = userWorkouts.stream()
-                    .collect(Collectors.groupingBy(Workout::getType))
-                    .entrySet().stream()
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            entry -> {
-                                List<Workout> workouts = entry.getValue();
-                                Map<String, Object> typeStats = new HashMap<>();
-                                typeStats.put("count", workouts.size());
-                                typeStats.put("totalDuration", workouts.stream().mapToInt(Workout::getDuration).sum());
-                                typeStats.put("totalCalories", workouts.stream().mapToInt(Workout::getCalories).sum());
-                                typeStats.put("averageDuration",
-                                        workouts.stream().mapToInt(Workout::getDuration).average().orElse(0));
-                                typeStats.put("averageCalories",
-                                        workouts.stream().mapToInt(Workout::getCalories).average().orElse(0));
-                                return typeStats;
-                            }));
-
-            return ResponseEntity.ok(statsByType);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Internal server error", "message", e.getMessage()));
+        User currentUser = getCurrentUser();
+        List<Workout> userWorkouts = getUserWorkouts(currentUser);
+        if (userWorkouts.isEmpty()) {
+            throw WorkoutException.noWorkoutsFound();
         }
+        Map<String, Map<String, Object>> statsByType = userWorkouts.stream()
+                .collect(Collectors.groupingBy(Workout::getType))
+                .entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> {
+                            List<Workout> workouts = entry.getValue();
+                            Map<String, Object> typeStats = new HashMap<>();
+                            typeStats.put("count", workouts.size());
+                            typeStats.put("totalDuration", workouts.stream().mapToInt(Workout::getDuration).sum());
+                            typeStats.put("totalCalories", workouts.stream().mapToInt(Workout::getCalories).sum());
+                            typeStats.put("averageDuration",
+                                    workouts.stream().mapToInt(Workout::getDuration).average().orElse(0));
+                            typeStats.put("averageCalories",
+                                    workouts.stream().mapToInt(Workout::getCalories).average().orElse(0));
+                            return typeStats;
+                        }));
+
+        return ResponseEntity.ok(statsByType);
     }
 
     @GetMapping("/progress/calories")
@@ -111,77 +89,56 @@ public class StatisticsController {
             @RequestParam(required = false) String endDate,
             @RequestParam(defaultValue = "daily") String period) {
 
-        try {
-            User currentUser = getCurrentUser();
-            if (currentUser == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
-            }
+        User currentUser = getCurrentUser();
+        LocalDate parsedEndDate = parseDate(endDate, LocalDate.now());
+        LocalDate parsedStartDate = parseDate(startDate, parsedEndDate.minusMonths(1));
 
-            LocalDate parsedEndDate = parseDate(endDate, LocalDate.now());
-            LocalDate parsedStartDate = parseDate(startDate, parsedEndDate.minusMonths(1));
-
-            if (parsedStartDate.isAfter(parsedEndDate)) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("error", "Invalid date range", "message", "Start date must be before or equal to end date"));
-            }
-
-            List<Workout> userWorkouts = getUserWorkouts(currentUser).stream()
-                    .filter(w -> !w.getDate().isBefore(parsedStartDate) && !w.getDate().isAfter(parsedEndDate))
-                    .collect(Collectors.toList());
-
-            Map<String, Object> progressData = new HashMap<>();
-            progressData.put("startDate", parsedStartDate);
-            progressData.put("endDate", parsedEndDate);
-            progressData.put("period", period);
-
-            switch (period.toLowerCase()) {
-                case "daily":
-                    progressData.put("data", getDailyCaloriesProgress(userWorkouts, parsedStartDate, parsedEndDate));
-                    break;
-                case "weekly":
-                    progressData.put("data", getWeeklyCaloriesProgress(userWorkouts, parsedStartDate, parsedEndDate));
-                    break;
-                case "monthly":
-                    progressData.put("data", getMonthlyCaloriesProgress(userWorkouts, parsedStartDate, parsedEndDate));
-                    break;
-                default:
-                    return ResponseEntity.badRequest().body(Map.of("error", "Invalid period", "message", "Use: daily, weekly, or monthly"));
-            }
-
-            return ResponseEntity.ok(progressData);
-        } catch (DateTimeParseException e) {
+        if (parsedStartDate.isAfter(parsedEndDate)) {
             return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Invalid date format", "message", "Please use format YYYY-MM-DD and ensure the date is valid", "details", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Internal server error", "message", e.getMessage()));
+                    .body(Map.of("error", "Invalid date range", "message",
+                            "Start date must be before or equal to end date"));
         }
+
+        List<Workout> userWorkouts = getUserWorkouts(currentUser).stream()
+                .filter(w -> !w.getDate().isBefore(parsedStartDate) && !w.getDate().isAfter(parsedEndDate))
+                .collect(Collectors.toList());
+
+        Map<String, Object> progressData = new HashMap<>();
+        progressData.put("startDate", parsedStartDate);
+        progressData.put("endDate", parsedEndDate);
+        progressData.put("period", period);
+
+        switch (period.toLowerCase()) {
+            case "daily":
+                progressData.put("data", getDailyCaloriesProgress(userWorkouts, parsedStartDate, parsedEndDate));
+                break;
+            case "weekly":
+                progressData.put("data", getWeeklyCaloriesProgress(userWorkouts, parsedStartDate, parsedEndDate));
+                break;
+            case "monthly":
+                progressData.put("data", getMonthlyCaloriesProgress(userWorkouts, parsedStartDate, parsedEndDate));
+                break;
+            default:
+                throw StatisticsException.invalidStatisticsData("Use: daily, weekly, or monthly");
+        }
+        return ResponseEntity.ok(progressData);
     }
 
     @GetMapping("/workouts/by-period")
     public ResponseEntity<?> getWorkoutsByPeriod(
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate) {
-
-        try {
             User currentUser = getCurrentUser();
-            if (currentUser == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
-            }
 
             LocalDate parsedEndDate = parseDate(endDate, LocalDate.now());
             LocalDate parsedStartDate = parseDate(startDate, parsedEndDate.minusMonths(1));
-
-            if (parsedStartDate.isAfter(parsedEndDate)) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("error", "Invalid date range", "message", "Start date must be before or equal to end date"));
-            }
+            if (parsedEndDate.isBefore(parsedStartDate)) { throw StatisticsException.statisticsDateConflict(); }
 
             List<Workout> userWorkouts = getUserWorkouts(currentUser).stream()
                     .filter(w -> !w.getDate().isBefore(parsedStartDate) && !w.getDate().isAfter(parsedEndDate))
                     .collect(Collectors.toList());
 
-            Map<String, Object> stats = new HashMap<>();
+            Map<String, Object> stats = new LinkedHashMap<>();
             stats.put("startDate", parsedStartDate);
             stats.put("endDate", parsedEndDate);
             stats.put("totalWorkouts", userWorkouts.size());
@@ -191,13 +148,6 @@ public class StatisticsController {
                     .collect(Collectors.groupingBy(Workout::getType, Collectors.counting())));
 
             return ResponseEntity.ok(stats);
-        } catch (DateTimeParseException e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Invalid date format", "message", "Please use format YYYY-MM-DD and ensure the date is valid", "details", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Internal server error", "message", e.getMessage()));
-        }
     }
 
     private LocalDate parseDate(String dateString, LocalDate defaultValue) throws DateTimeParseException {
@@ -210,7 +160,7 @@ public class StatisticsController {
     private User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        return userRepository.findByUsername(username).orElse(null);
+        return userRepository.findByUsername(username).orElseThrow(() -> UserException.currentUserNotFound());
     }
 
     private List<Workout> getUserWorkouts(User user) {

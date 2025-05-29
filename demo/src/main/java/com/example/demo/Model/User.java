@@ -3,6 +3,8 @@ package com.example.demo.Model;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,7 +23,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "\"user\"")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password", "role"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "role"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,8 +31,9 @@ public class User {
     
     private String username;
     private String email;
-    private String password;
     private String role;
+    @JsonProperty(access = Access.WRITE_ONLY)
+    private String password;
 
     @OneToMany(mappedBy = "user")
     @JsonIgnoreProperties("user")

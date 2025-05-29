@@ -1,9 +1,17 @@
 package com.example.demo.Exception;
 
+import org.springframework.http.HttpStatus;
+
 public class StatisticsException extends RuntimeException {
+    private final HttpStatus status;
     
-    public StatisticsException(String message) {
+    public StatisticsException(String message, HttpStatus status) {
         super(message);
+        this.status = status;
+    }
+
+    public HttpStatus getStatus() {
+        return status;
     }
 
     /**
@@ -13,7 +21,7 @@ public class StatisticsException extends RuntimeException {
      * @return Statistics with id not found.
      */
     public static StatisticsException statisticsNotFound(Long id) {
-        return new StatisticsException(String.format("Statistics with id %d not found.", id));
+        return new StatisticsException(String.format("Statistics with id %d not found.", id), HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -23,7 +31,7 @@ public class StatisticsException extends RuntimeException {
      * @return Access denied to statistics with id.
      */
     public static StatisticsException statisticsAccessDenied(Long id) {
-        return new StatisticsException(String.format("Access denied to statistics with id %d.", id));
+        return new StatisticsException(String.format("Access denied to statistics with id %d.", id), HttpStatus.FORBIDDEN);
     }
 
     /**
@@ -33,7 +41,7 @@ public class StatisticsException extends RuntimeException {
      * @return Invalid statistics data: field is required.
      */
     public static StatisticsException invalidStatisticsData(String field) {
-        return new StatisticsException(String.format("Invalid statistics data: %s is required.", field));
+        return new StatisticsException(String.format("Invalid statistics data: %s is required.", field), HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -42,7 +50,7 @@ public class StatisticsException extends RuntimeException {
      * @return StatisticsException with the provided message.
      */
     public static StatisticsException feiledGeneralstats(String message) {
-        return new StatisticsException("Failed to fetch general statistics: " + message);
+        return new StatisticsException("Failed to fetch general statistics: " + message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
@@ -52,7 +60,7 @@ public class StatisticsException extends RuntimeException {
      * @return StatisticsException indicating that the start date must be before or equal to the end date.
      */
     public static StatisticsException statisticsDateConflict() {
-        return new StatisticsException("Invalid date range. Start date must be before or equal to end date");
+        return new StatisticsException("Invalid date range. Start date must be before or equal to end date", HttpStatus.BAD_REQUEST);
     }
     
 }

@@ -2,6 +2,8 @@ package com.example.demo.Exception;
 
 import java.time.LocalDate;
 
+import org.springframework.http.HttpStatus;
+
 /**
  * Custom exception class for handling workout-related errors in the
  * application.
@@ -10,12 +12,16 @@ import java.time.LocalDate;
  * with descriptive error messages.
  */
 public class WorkoutException extends RuntimeException {
-
-    public WorkoutException(String message) {
+    HttpStatus status;
+    
+    public WorkoutException(String message, HttpStatus status) {
         super(message);
+        this.status = status;
     }
 
-    
+    public HttpStatus getStatus() {
+        return status;
+    }
 
     /***
      * Creates a WorkoutException indicating the inability to find the
@@ -26,7 +32,7 @@ public class WorkoutException extends RuntimeException {
      * @return Workout with id not found.
      */
     public static WorkoutException workoutNotFound(Long id) {
-        return new WorkoutException(String.format("Workout with id %d not found.", id));
+        return new WorkoutException(String.format("Workout with id %d not found.", id), HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -38,7 +44,7 @@ public class WorkoutException extends RuntimeException {
      * @return Access denied: Workout with id does not belong to you.
      */
     public static WorkoutException workoutAccessDenied(Long id) {
-        return new WorkoutException(String.format("Access denied: Workout with id %d does not belong to you.", id));
+        return new WorkoutException(String.format("Access denied: Workout with id %d does not belong to you.", id), HttpStatus.FORBIDDEN);
     }
 
     /**
@@ -48,7 +54,7 @@ public class WorkoutException extends RuntimeException {
      * @return Invalid workout data: field is required.
      */
     public static WorkoutException invalidWorkoutData(String field) {
-        return new WorkoutException(String.format("Invalid workout data: %s is required.", field));
+        return new WorkoutException(String.format("Invalid workout data: %s is required.", field), HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -58,7 +64,7 @@ public class WorkoutException extends RuntimeException {
      * @return Workout end date cannot be before start date.
      */
     public static WorkoutException workoutDateConflict() {
-        return new WorkoutException("Workout end date cannot be before start date.");
+        return new WorkoutException("Workout end date cannot be before start date.", HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -68,7 +74,7 @@ public class WorkoutException extends RuntimeException {
      * @return Invalid parameter: param is required.
      */
     public static WorkoutException invalidParam(String param) {
-        return new WorkoutException(String.format("Invalid parameter: %s is required.", param));
+        return new WorkoutException(String.format("Invalid parameter: %s is required.", param), HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -79,7 +85,7 @@ public class WorkoutException extends RuntimeException {
      * @return No workouts found with type.
      */
     public static WorkoutException workoutNotFoundByType(String type) {
-        return new WorkoutException(String.format("No workouts found with type: '%s'.", type));
+        return new WorkoutException(String.format("No workouts found with type: '%s'.", type), HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -90,7 +96,7 @@ public class WorkoutException extends RuntimeException {
      * @return No workouts found on date.
      */
     public static WorkoutException workoutNotFoundByDate(LocalDate date) {
-        return new WorkoutException(String.format("No workouts found on date: %s.", date));
+        return new WorkoutException(String.format("No workouts found on date: %s.", date), HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -100,7 +106,7 @@ public class WorkoutException extends RuntimeException {
      * @return No workouts found for the current user.
      */
     public static WorkoutException noWorkoutsFound() {
-        return new WorkoutException("Not found workouts for the current user.");
+        return new WorkoutException("Not found workouts for the current user.", HttpStatus.NOT_FOUND);
 
     }
 }
