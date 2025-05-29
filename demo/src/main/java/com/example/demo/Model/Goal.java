@@ -31,10 +31,9 @@ public class Goal {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties({ "goals", "workouts", "password" })
+    @JsonIgnoreProperties({ "goals", "workouts", "password", "role", "id"})
     private User user;
 
-    private int goalNumber;
     private Integer targetCalories;
     private Integer targetWorkouts;
     private LocalDate startDate;
