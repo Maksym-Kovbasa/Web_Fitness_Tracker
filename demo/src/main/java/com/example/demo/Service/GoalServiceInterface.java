@@ -23,4 +23,6 @@ public interface GoalServiceInterface {
     String getGoalStatus(Goal goal);
 
     List<Goal> getGoalsByUser(User user);
+
+    void fixInvalidProgressValues();
 }

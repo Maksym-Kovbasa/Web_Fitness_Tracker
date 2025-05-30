@@ -276,7 +276,7 @@ public class AdminController {
             existing.setDuration(workout.getDuration());
             existing.setCalories(workout.getCalories());
             existing.setDate(workout.getDate());
-
+            
             if (userId != null) {
                 Optional<User> userOpt = userRepository.findById(userId);
                 if (userOpt.isPresent()) {

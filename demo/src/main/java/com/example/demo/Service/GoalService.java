@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.Exception.UserException;
 import com.example.demo.Model.Goal;
 import com.example.demo.Model.User;
 import com.example.demo.Model.Workout;
@@ -158,7 +159,7 @@ public class GoalService implements GoalServiceInterface {
                 logger.debug("Goal has no user assigned, attempting to assign current user");
                 try {
                     User user = userRepository.findByUsername(username)
-                            .orElseThrow(() -> new RuntimeException("User not found: " + username));
+                            .orElseThrow(() -> UserException.userNotFound(id));
                     goal.setUser(user);
                     goal = goalRepository.save(goal);
                     logger.debug("Successfully assigned user to goal");

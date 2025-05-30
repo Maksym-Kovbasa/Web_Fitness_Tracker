@@ -40,11 +40,17 @@ public class WorkoutService implements WorkoutServiceInterface {
 
         User currentUser = getCurrentUser(username);
 
-        return workoutRepository.findAll().stream()
+        List<Workout> userWorkouts = workoutRepository.findAll().stream()
                 .filter(w -> w.getUser() != null && w.getUser().getId().equals(currentUser.getId()))
                 .filter(w -> type == null || w.getType().equalsIgnoreCase(type))
                 .filter(w -> date == null || w.getDate().equals(date))
                 .toList();
+
+        if (userWorkouts.isEmpty()) {
+            throw WorkoutException.noWorkoutsFound();
+        }
+
+        return userWorkouts;
     }
 
     @Override
@@ -107,7 +113,7 @@ public class WorkoutService implements WorkoutServiceInterface {
     public Workout createWorkout(Workout workout) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        logger.debug("Creating workout for user: {}, time wor workout: {}", username, workout.getDate());
+        logger.debug("Creating workout for user: {}, workout date: {}", username, workout.getDate());
         validateWorkoutData(workout);
 
         User user = getCurrentUser(username);
@@ -115,7 +121,12 @@ public class WorkoutService implements WorkoutServiceInterface {
 
         Workout savedWorkout = workoutRepository.save(workout);
 
-        //goalService.updateAllGoalsProgressForUserAndDate(user, workout.getDate());
+        try {
+            goalService.updateAllGoalsProgressForUserAndDate(user, workout.getDate());
+            logger.debug("Updated goals progress after creating workout");
+        } catch (Exception e) {
+            logger.warn("Failed to update goals progress: {}", e.getMessage());
+        }
 
         logger.debug("Successfully created workout with id: {}", savedWorkout.getId());
         return savedWorkout;
@@ -141,12 +152,24 @@ public class WorkoutService implements WorkoutServiceInterface {
             throw WorkoutException.workoutAccessDenied(id);
         }
 
+        LocalDate oldDate = existingWorkout.getDate();
+        
         existingWorkout.setType(workout.getType());
         existingWorkout.setDuration(workout.getDuration());
         existingWorkout.setCalories(workout.getCalories());
         existingWorkout.setDate(workout.getDate());
 
         Workout updatedWorkout = workoutRepository.save(existingWorkout);
+
+        try {
+            goalService.updateAllGoalsProgressForUserAndDate(currentUser, oldDate);
+            if (!oldDate.equals(workout.getDate())) {
+                goalService.updateAllGoalsProgressForUserAndDate(currentUser, workout.getDate());
+            }
+            logger.debug("Updated goals progress after updating workout");
+        } catch (Exception e) {
+            logger.warn("Failed to update goals progress: {}", e.getMessage());
+        }
 
         logger.debug("Successfully updated workout with id: {}", id);
         return updatedWorkout;
@@ -172,8 +195,12 @@ public class WorkoutService implements WorkoutServiceInterface {
         LocalDate workoutDate = workout.getDate();
 
         workoutRepository.delete(workout);
-
-        //goalService.updateAllGoalsProgressForUserAndDate(currentUser, workoutDate);
+        try {
+            goalService.updateAllGoalsProgressForUserAndDate(currentUser, workoutDate);
+            logger.debug("Updated goals progress after deleting workout");
+        } catch (Exception e) {
+            logger.warn("Failed to update goals progress: {}", e.getMessage());
+        }
 
         logger.debug("Successfully deleted workout with id: {}", id);
     }
