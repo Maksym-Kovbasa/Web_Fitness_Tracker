@@ -12,41 +12,313 @@
     font-family: 'Nova-Round', sans-serif;
 }
 
+body {
+    background-image: url("sunset-reduced.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    position: relative;
+}
+
+body::before {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+    background-image: url("sunset-reduced.jpg");
+    z-index: -1;
+}
+
+.wrapper {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    margin-left: 30px;
+    transform: translateY(-50%);
+    width: 400px;
+    padding: 40px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.wrapper-list {
+    position: sticky;
+    top: 20px;
+    margin: 20px auto;
+    margin-top: 0;
+    margin-right: 30px;
+    padding: 20px;
+    width: 90%;
+    max-width: 900px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: center;
+    min-height: 20vh;
+    transition: all 0.3s ease;
+}
+
+.wrapper-list:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+}
+
+.user-info {
+    position: fixed;
+    margin-left: 30px;
+    top: 20px;
+    left: 20px;
+    width: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    transition: all 0.3s ease;
+    padding: 10px;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 1rem;
+    z-index: 1000;
+}
+
+.user-info span {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.user-info form {
+    display: inline;
+    margin-left: 10px;
+}
+
+.user-info:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+}
+
+
+.list-workouts h2 {
+    font-size: 2rem;
+    margin-bottom: 25px;
+    color: #ffffff;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.add-workout {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 15px;
+    margin: 10px 0;
+    min-width: none;
+    font-size: 1.4rem;
+    border-radius: 8px;
+    grid-column: 1 / -1;
+    justify-self: center;
+    align-self: center;
+    max-width: 300px;
+    width: 100%;
+}
+
+.add-workout:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+}
+
+.add-workout h3 {
+    font-size: 1.5rem;
+    margin-bottom: 25px;
+    color: #ffffff;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.add-workout form {
+    display: grid;
+    gap: 10px;
+    text-align: center;
+    justify-self: center;
+    align-self: center;
+}
+
+.add-workout input {
+    width: 100%;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    outline: none;
+    font-size: 16px;
+    color: #ffffff;
+    padding: 0 15px;
+    transition: all 0.3s ease;
+}
+
+.add-workout input:focus {
+    border-color: #ffdde1;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.add-workout input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
 table {
     border-collapse: collapse;
     width: 100%;
     margin-top: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 th,
 td {
-    border: 1px solid #ccc;
-    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 12px;
+    text-align: center;
+    color: #ffffff;
 }
 
 th {
-    background: #eee;
+    background: rgba(255, 255, 255, 0.2);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+td {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+tr:hover td {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.btn {
+    background-color: #dc3545;
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 20px;
+    font-size: 14px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .error {
-    color: #d00;
+    color: #721c24;
+    background-color: rgba(248, 215, 218, 0.9);
+    border: 1px solid #f5c6cb;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    text-align: center;
 }
 
-.user-info {
-    position: absolute;
-    top: 20px;
-    right: 40px;
-    font-weight: bold;
-    color: #333;
+.success {
+    color: #155724;
+    background-color: rgba(212, 237, 218, 0.9);
+    border: 1px solid #c3e6cb;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    text-align: center;
 }
 
-.add-workout {
-    place-items: center;
-    font-weight: bold;
-    color: #333;
+@media (max-width: 1200px) {
+    .wrapper {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .user-info {
+        position: relative;
+        width: 100%;
+        margin: 0;
+        left: 0;
+        top: 0;
+    }
+
+    .add-workout {
+        order: -1;
+    }
 }
 
-.list-workouts {
-    place-items: center;
-    gap: 20px;
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .wrapper {
+        padding-top: 20px;
+    }
+
+    .user-info {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .list-workouts,
+    .add-workout {
+        padding: 20px;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    th,
+    td {
+        padding: 8px;
+    }
+}
+
+button {
+    background-color: #271930;
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    padding: 15px 20px;
+    cursor: pointer;
+    border-radius: 25px;
+    font-size: 16px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    color: #000000;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #ffffff;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #aeada8 0%, #271930 100%);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+    background: #9f9e9e;
 }

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Update goal - Admin Panel</title>
+    <link rel="stylesheet" href="/style/admingoal.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Update goal</h1>
+            <p>Panel admin</p>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger">
+            <strong>❌ Error!</strong> <span th:text="${error}"></span>
+        </div>
+
+        <div class="goal-info">
+            <h3>📋 Information about goal</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>🆔 ID goal:</strong><br>
+                    <span th:text="${goal.id}"></span>
+                </div>
+                <div class="info-item">
+                    <strong>👤 Owner:</strong><br>
+                    <span th:text="${goal.user != null ? goal.user.username : 'Unknown'}"></span>
+                </div>
+                <div class="info-item">
+                    <strong>📊 Current status:</strong><br>
+                    <span th:text="${goal.status != null ? goal.status : 'Undefined'}"></span>
+                </div>
+                <div class="info-item">
+                    <strong>📈 Progress:</strong><br>
+                    <span th:text="${goal.workoutProgress != null ? goal.workoutProgress + '%' : '0%'}"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-info">
+            <h4>🎯 Current target indicators</h4>
+            <div>
+                <strong>🔥 Target calories:</strong>
+                <span th:text="${goal.targetCalories}"></span>
+            </div>
+            <br>
+            <div>
+                <strong>💪 Targeted training:</strong>
+                <span th:text="${goal.targetWorkouts}"></span>
+            </div>
+            <br>
+            <div>
+                <strong>📅 Period:</strong>
+                <span th:text="${goal.startDate}"></span> - <span th:text="${goal.endDate}"></span>
+            </div>
+        </div>
+
+        <form th:action="@{'/web/admin/goals/edit/' + ${goal.id}}" method="post" th:object="${goal}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <div class="form-section goal">
+                <h4>🎯 New target indicators</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="targetCalories">🔥 Target calories:</label>
+                        <input type="number" id="targetCalories" th:field="*{targetCalories}" min="1" max="50000"
+                            placeholder="Enter the number of calories" required />
+                        <small style="color: #6c757d;">Minimum: 1, Maximum: 50,000</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="targetWorkouts">💪 Targeted training:</label>
+                        <input type="number" id="targetWorkouts" th:field="*{targetWorkouts}" min="1" max="1000"
+                            placeholder="Enter the number of training sessions" required />
+                        <small style="color: #6c757d;">Minimum: 1, Maximum: 1,000</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section dates">
+                <h4>📅 Execution period</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="startDate">📅 Start date:</label>
+                        <input type="date" id="startDate" th:field="*{startDate}" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endDate">📅 Date of completion:</label>
+                        <input type="date" id="endDate" th:field="*{endDate}" required />
+                    </div>
+                </div>
+                <small style="color: #6c757d;">
+                    ⚠️ Attention: Changing dates may affect the calculation of goal progress.
+                </small>
+            </div>
+
+            <div class="button-group">
+                <form style="display: inline;">
+                    <button type="submit">💾 Save changes</button>
+                </form>
+                <form action="/web/admin" method="get" style="display: inline;">
+                    <button type="submit"> ← Return to the panel</button>
+                </form>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+
+            function validateDates() {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+
+                if (startDate && endDate) {
+                    if (new Date(endDate) < new Date(startDate)) {
+                        endDateInput.setCustomValidity('The end date cannot be earlier than the start date.');
+                    } else {
+                        endDateInput.setCustomValidity('');
+                    }
+                }
+            }
+
+            startDateInput.addEventListener('change', function () {
+                const startDate = this.value;
+                endDateInput.min = startDate;
+                validateDates();
+            });
+
+            endDateInput.addEventListener('change', function () {
+                const endDate = this.value;
+                startDateInput.max = endDate;
+                validateDates();
+            });
+
+            validateDates();
+        });
+
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const confirmed = confirm('Are you sure you want to save changes to this goal?');
+            if (!confirmed) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+
+</html>

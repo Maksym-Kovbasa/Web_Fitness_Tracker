@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel - Fitness Tracker</title>
+    <link rel="stylesheet" href="/style/adminpanel.css">
+</head>
+<body>
+<div class="wrapper">
+    <h1>🛠️ Admin Panel</h1>
+    
+    <!-- Navigation Buttons -->
+    <div class="navigation-buttons">
+        <form action="/web/workouts" method="get" style="display: inline;">
+            <button type="submit" class="nav-button">My Workouts</button>
+        </form>
+        <form action="/web/goals" method="get" style="display: inline;">
+            <button type="submit" class="nav-button">My Goals</button>
+        </form>
+        <form action="/web/stats" method="get" style="display: inline;">
+            <button type="submit" class="nav-button">Statistics</button>
+        </form>
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <button type="submit" class="nav-button logout-btn">Logout</button>
+        </form>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number" th:text="${users.size()}">0</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" th:text="${workouts.size()}">0</div>
+            <div class="stat-label">Total Workouts</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" th:text="${goals.size()}">0</div>
+            <div class="stat-label">Total Goals</div>
+        </div>
+    </div>
+
+    <!-- Users Section -->
+    <div class="content-section">
+        <h2 class="section-title">👥 Users Management</h2>
+        
+        <div th:if="${users.empty}" class="empty-state">
+            <div class="empty-state-icon">👤</div>
+            <p>No users found in the system.</p>
+        </div>
+
+        <table th:unless="${users.empty}" class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.id}">1</td>
+                    <td th:text="${user.username}">username</td>
+                    <td th:text="${user.email}">email@example.com</td>
+                    <td th:text="${user.role}">USER</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a th:href="@{'/web/admin/users/edit/' + ${user.id}}" class="action-btn edit-btn">✏️ Edit</a>
+                            <form th:action="@{'/web/admin/users/' + ${user.id} + '/goals/delete-all'}" method="post" class="inline-form"
+                                  onsubmit="return confirm('Delete all goals for this user?');">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="action-btn danger-btn">🗑️ Clear Goals</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Workouts Section -->
+    <div class="content-section">
+        <h2 class="section-title">🏃‍♂️ Workouts Management</h2>
+        
+        <div th:if="${workouts.empty}" class="empty-state">
+            <div class="empty-state-icon">🏃‍♂️</div>
+            <p>No workouts found in the system.</p>
+        </div>
+
+        <table th:unless="${workouts.empty}" class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Type</th>
+                    <th>Duration (min)</th>
+                    <th>Calories</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="workout : ${workouts}">
+                    <td th:text="${workout.id}">1</td>
+                    <td th:text="${workout.user != null ? workout.user.username : 'N/A'}">username</td>
+                    <td th:text="${workout.type}">Running</td>
+                    <td th:text="${workout.duration}">30</td>
+                    <td th:text="${workout.calories}">300</td>
+                    <td th:text="${workout.date}">2024-01-01</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a th:href="@{'/web/admin/workouts/edit/' + ${workout.id}}" class="action-btn edit-btn">✏️ Edit</a>
+                            <form th:action="@{'/web/admin/workouts/' + ${workout.id} + '/delete'}" method="post" class="inline-form"
+                                  onsubmit="return confirm('Delete this workout?');">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="action-btn delete-btn">🗑️ Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Goals Section -->
+    <div class="content-section">
+        <h2 class="section-title">🎯 Goals Management</h2>
+        
+        <div th:if="${goals.empty}" class="empty-state">
+            <div class="empty-state-icon">🎯</div>
+            <p>No goals found in the system.</p>
+        </div>
+
+        <div th:unless="${goals.empty}" class="goals-table-container">
+            <table class="data-table goals-table">
+                <thead>
+                    <tr>
+                        <th class="goal-id">ID</th>
+                        <th class="goal-user">User</th>
+                        <th class="goal-target-calories">Target Calories</th>
+                        <th class="goal-target-workouts">Target Workouts</th>
+                        <th class="goal-status">Status</th>
+                        <th class="goal-actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="goal : ${goals}" class="goal-row">
+                        <td class="goal-id-cell" th:text="${goal.id}">1</td>
+                        <td class="goal-user-cell">
+                            <div class="user-info">
+                                <span class="user-icon">👤</span>
+                                <span th:text="${goal.user != null ? goal.user.username : 'Unknown'}">username</span>
+                            </div>
+                        </td>
+                        <td class="goal-calories-cell">
+                            <div class="metric-display">
+                                <span class="metric-icon">🔥</span>
+                                <span class="metric-value" th:text="${goal.targetCalories}">2000</span>
+                                <span class="metric-unit">cal</span>
+                            </div>
+                        </td>
+                        <td class="goal-workouts-cell">
+                            <div class="metric-display">
+                                <span class="metric-icon">💪</span>
+                                <span class="metric-value" th:text="${goal.targetWorkouts}">5</span>
+                                <span class="metric-unit">workouts</span>
+                            </div>
+                        </td>
+                        <td class="goal-status-cell">
+                            <div class="status-badge" th:classappend="${goal.status == 'COMPLETED' ? 'status-completed' : (goal.status == 'IN_PROGRESS' ? 'status-progress' : 'status-pending')}">
+                                <span th:if="${goal.status == 'COMPLETED'}" class="status-icon">✅</span>
+                                <span th:if="${goal.status == 'IN_PROGRESS'}" class="status-icon">🔄</span>
+                                <span th:if="${goal.status == 'PENDING'}" class="status-icon">⏳</span>
+                                <span class="status-text" th:text="${goal.status}">IN_PROGRESS</span>
+                            </div>
+                        </td>
+                        <td class="goal-actions-cell">
+                            <div class="action-buttons">
+                                <a th:href="@{'/web/admin/goals/edit/' + ${goal.id}}" class="action-btn edit-btn goal-edit">
+                                    ✏️ Edit
+                                </a>
+                                <form th:action="@{'/web/admin/goals/' + ${goal.id} + '/delete'}" 
+                                      method="post" class="inline-form"
+                                      onsubmit="return confirm('Delete this goal?');">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    <button type="submit" class="action-btn delete-btn goal-delete">🗑️ Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Footer Info -->
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); font-size: 14px;">
+        <p>🛡️ Admin Panel - Fitness Tracker Management System</p>
+        <p>Use with caution. All actions are logged and monitored.</p>
+    </div>
+</div>
+</body>
+</html>

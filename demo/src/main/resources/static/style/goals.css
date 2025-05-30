@@ -12,8 +12,6 @@
     font-family: 'Nova-Round', sans-serif;
 }
 
-
-
 body {
     background-image: url("sunset-reduced.jpg");
     background-size: cover;
@@ -38,8 +36,8 @@ body::before {
 .wrapper-add {
     position: fixed;
     left: 20px;
-    top: 50%;
-    margin-left: 50px;
+    top: 60%;
+    margin-left: 30px;
     transform: translateY(-50%);
     width: 400px;
     border-radius: 15px;
@@ -55,10 +53,14 @@ body::before {
 }
 
 .wrapper-list {
-    margin-left: 40%;
-    flex: 1;
-    max-width: 800px;
+    position: sticky;
+    top: 20px;
+    margin: 20px auto;
+    margin-top: 0;
+    margin-right: 30px;
     padding: 20px;
+    width: 90%; 
+    max-width: 900px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 15px;
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -68,9 +70,9 @@ body::before {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
     align-self: center;
     min-height: 20vh;
+    transition: all 0.3s ease;
 }
 
 .wrapper-add:hover {
@@ -245,13 +247,10 @@ button:hover {
 
 .list-goal {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-    padding: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
     position: relative;
-    margin: 0 auto;
-    width: 100%;
-    min-height: 300px;
 }
 
 .list-goal h2 {
@@ -293,8 +292,9 @@ button:hover {
 
 .info {
     color: #0c5460;
-    background-color: #d1ecf1;
-    border: 1px solid #bee5eb;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     padding: 15px;
     margin: 10px 0;
     font-size: 1.4rem;
@@ -306,6 +306,12 @@ button:hover {
     max-width: 400px;
     width: 100%;
 }
+
+.info:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
 
 .goal-card:hover {
     transform: translateY(-5px);
@@ -331,4 +337,82 @@ button:hover {
         width: 100%;
         min-height: auto;
     }
+}
+
+.filter-goals {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 15px;
+    margin: 10px 0;
+    font-size: 1.4rem;
+    border-radius: 8px;
+    grid-column: 1 / -1;
+    justify-self: center;
+    align-self: center;
+    max-width: 300px;
+    width: 100%;
+}
+
+.filter-goals:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.filter-goals form {
+    display: grid;
+    gap: 10px;
+    text-align: center;
+    justify-self: center;
+    align-self: center;
+}
+
+.action {
+    margin-top: 10px;
+}
+
+.user-info {
+    position: fixed;
+    margin-left: 30px;
+    top: 20px;
+    left: 20px;
+    width: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    transition: all 0.3s ease;
+    padding: 10px;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 1rem;
+    z-index: 1000;
+}
+
+.user-info span {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.user-info .actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-info:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #aeada8 0%, #271930 100%);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+    background: #9f9e9e;
 }

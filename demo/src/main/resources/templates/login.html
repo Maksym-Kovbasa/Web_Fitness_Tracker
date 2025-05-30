@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Fitness Tracker</title>
+    <link rel="stylesheet" href="/style/login.css">
+</head>
+<body>
+    <div class="wrapper">
+        <form action="/login" method="post">
+            <h2>Welcome to Fitness Tracker</h2>
+            
+            <div th:if="${success}" id="loginSuccess" style="color:#0a0;margin-bottom:15px;" th:text="${success}"></div>
+            
+            <div th:if="${param.error}" id="loginError" style="color:#d00;margin-bottom:15px;">
+                Invalid username or password. Please try again.
+            </div>
+            
+            <div class="input-field">
+                <input type="text" name="username" required>
+                <label>Enter your username or email</label>
+            </div>
+            
+            <div class="input-field">
+                <input type="password" name="password" required>
+                <label>Enter your password</label>
+            </div>
+            
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            
+            <button type="submit">Log In</button>
+            
+            <div class="register">
+                <p>Don't have an account? <a th:href="@{/register}">Register</a></p>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

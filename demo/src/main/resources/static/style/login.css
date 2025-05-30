@@ -1,15 +1,15 @@
 @font-face {
-    font-family: 'Nova-Round';
-    src: url("./font/Nova-round.ttf") format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'Nova-Round';
+  src: url("./font/Nova-round.ttf") format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Nova-Round', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Nova-Round', sans-serif;
 }
 
 body {
@@ -130,7 +130,7 @@ h2 {
 
 button {
   background-color: #271930;
- color: #ffffff;
+  color: #ffffff;
   font-weight: 600;
   border: none;
   padding: 15px 20px;
@@ -152,27 +152,27 @@ button:hover {
   margin-top: 30px;
   color: #ffffff;
 }
-                                         
-                                                     
-            
+
+
+
 .progress-bar {
-    width: 100%;
-    height: 20px;
-    background-color: #f0f0f0;
-    border-radius: 10px;
-    margin: 10px 0;
+  width: 100%;
+  height: 20px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  margin: 10px 0;
 }
 
 .progress {
-    height: 100%;
-    background-color: #4CAF50;
-    border-radius: 10px;
-    transition: width 0.3s ease-in-out;
+  height: 100%;
+  background-color: #4CAF50;
+  border-radius: 10px;
+  transition: width 0.3s ease-in-out;
 }
 
 .goal-card {
-    padding: 20px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+  padding: 20px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }

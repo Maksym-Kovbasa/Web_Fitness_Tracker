@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Fitness Tracker - Your Personal Fitness Journey</title>
+    <link rel="stylesheet" href="/style/about.css">
+</head>
+
+<body>
+    <div class="welcome2">
+        <div class="welcome-container">
+            <div class="text-center">
+                <h1 class="text-container">Welcome to Fitness Tracker</h1>
+                <p class="track">Track your workouts, set ambitious goals, and achieve your fitness dreams with our
+                    comprehensive fitness tracking platform!</p>
+                <div class="actions">
+                    <form action="/login" method="get" style="display: inline;">
+                        <button type="submit">Get Started</button>
+                    </form>
+                    <form action="#features" method="get" style="display: inline;"
+                        onsubmit="event.preventDefault(); document.getElementById('features').scrollIntoView({behavior: 'smooth'});">
+                        <button type="submit">Learn More</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <section id="features" class="welcome">
+        <div class="welcome-container">
+            <div class="text-center">
+                <div class="welcome-text">
+                    <h2>Why Choose Fitness Tracker?</h2>
+                    <p>Everything you need to stay motivated and reach your fitness goals</p>
+                </div>
+            </div>
+            <div class="choose">
+                <div class="cards">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="ispan"></i>
+                        </div>
+                        <h4>Track Workouts</h4>
+                        <p>Log your exercises, duration, and calories burned. Keep a detailed record of your fitness
+                            journey.</p>
+                    </div>
+                </div>
+                <div class="cards">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-target"></i>
+                        </div>
+                        <h4>Set Goals</h4>
+                        <p>Create personalized fitness goals and track your progress. Stay motivated with clear targets.
+                        </p>
+                    </div>
+                </div>
+                <div class="cards">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4>View Statistics</h4>
+                        <p>Analyze your progress with detailed charts and statistics. See how far you've come!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="stats">
+        <div class="welcome-container">
+            <div class="stats-center">
+                <div class="stats-card">
+                    <div class="stats-item">
+                        <h3 class="stat-number">10K+</h3>
+                        <p class="stat-label">Workouts Logged</p>
+                    </div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-item">
+                        <h3 class="stat-number">500+</h3>
+                        <p class="stat-label">Active Users</p>
+                    </div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-item">
+                        <h3 class="stat-number">1M+</h3>
+                        <p class="stat-label">Calories Burned</p>
+                    </div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-item">
+                        <h3 class="stat-number">95%</h3>
+                        <p class="stat-label">Goal Achievement</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="how">
+        <div class="how-container">
+            <div class="how-center">
+                <div class="how-col">
+                    <h2 class="text-center">How It Works</h2>
+                    <p class="lead text-muted">Get started in just 3 simple steps</p>
+                </div>
+            </div>
+            <div class="choose">
+                <div class="how-card">
+                    <div class="step-number">1</div>
+                    <h4>Sign Up</h4>
+                    <p>Create your free account and set up your profile in minutes.</p>
+                </div>
+                <div class="how-card">
+                    <div class="step-number">2</div>
+                    <h4>Set Goals</h4>
+                    <p>Define your fitness objectives and create a personalized plan.</p>
+                </div>
+                <div class="how-card">
+                    <div class="step-number">3</div>
+                    <h4>Track Progress</h4>
+                    <p>Log workouts and watch your progress with detailed analytics.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="cta">
+        <div class="cta-container">
+            <div class="cta-wr">
+                <div class="cta-wr2">
+                    <h2>Ready to Start Your Fitness Journey?</h2>
+                    <p class="lead text-white-50 mb-5">Join thousands of users who have already transformed their lives
+                        with Fitness Tracker.</p>
+                    <div class="actions">
+                        <form action="/register" method="get" style="display: inline;">
+                            <button type="submit">Sign Up Free</button>
+                        </form>
+                        <form action="/login" method="get" style="display: inline;">
+                            <button type="submit">Already a Member?</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+        <div class="futter-container">
+            <div class="row">
+                <div class="futter-text">
+                    <p class="text-muted">Your personal fitness companion for a healthier lifestyle.</p>
+                </div>
+            </div>
+            <hr class="line">
+            <div class="row">
+                <div class="autor">
+                    <p class="text-muted mb-0">&copy; 2025 Kovbasa-Maksym. Fitness Tracker.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function (entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, .stat-item').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+
+</html>

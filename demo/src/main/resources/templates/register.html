@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - Fitness Tracker</title>
+    <link rel="stylesheet" href="/style/login.css">
+</head>
+<body>
+    <div class="wrapper">
+        <form th:action="@{/register}" th:object="${user}" method="post">
+            <h2>Join to our Fitness Tracker</h2>
+            
+            <!-- Повідомлення про помилки -->
+            <div th:if="${error}" id="registerError" style="color:#d00;margin-bottom:15px;" th:text="${error}"></div>
+            
+            <div class="input-field">
+                <input type="text" th:field="*{username}" required>
+                <label>Enter your username</label>
+            </div>
+            
+            <div class="input-field">
+                <input type="email" th:field="*{email}" required>
+                <label>Enter your email</label>
+            </div>
+            
+            <div class="input-field">
+                <input type="password" th:field="*{password}" required>
+                <label>Enter your password</label>
+            </div>
+            
+            <!-- CSRF токен для безпеки -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            
+            <button type="submit">Register</button>
+            
+            <div class="register">
+                <p>Already have an account? <a th:href="@{/login}">Login</a></p>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

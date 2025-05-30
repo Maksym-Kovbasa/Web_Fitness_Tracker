@@ -1,0 +1,345 @@
+@font-face {
+    font-family: 'Nova-Round';
+    src: url("./font/Nova-round.ttf") format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nova-Round', sans-serif;
+}
+
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    padding: 20px 10px;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url("sunset-reduced.jpg") no-repeat center center;
+    background-size: cover;
+    background-attachment: fixed;
+    z-index: -1;
+}
+
+/* Додатковий overlay для кращого контрасту */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: -1;
+}
+
+.wrapper {
+    width: 90%;
+    max-width: 1200px;
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.wrapper:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+/* Стилі для повідомлень */
+.message {
+    margin-bottom: 20px;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.success-message {
+    color: #0a0;
+    background: rgba(0, 170, 0, 0.1);
+    border: 1px solid rgba(0, 170, 0, 0.3);
+}
+
+.error-message {
+    color: #d00;
+    background: rgba(221, 0, 0, 0.1);
+    border: 1px solid rgba(221, 0, 0, 0.3);
+}
+
+.info-message {
+    color: #0099cc;
+    background: rgba(0, 153, 204, 0.1);
+    border: 1px solid rgba(0, 153, 204, 0.3);
+}
+
+/* Навігаційні кнопки */
+.navigation-buttons {
+    margin-bottom: 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.nav-button {
+    padding: 12px 24px;
+    background-color: #271930;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 14px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    color: #000000;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #ffffff;
+    text-decoration: none;
+}
+
+/* Секції контенту */
+.content-section {
+    margin-bottom: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-title {
+    font-size: 1.8rem;
+    color: #ffffff;
+    margin-bottom: 20px;
+    text-align: left;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 10px;
+}
+
+/* Таблиці */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.data-table th {
+    background: rgba(255, 255, 255, 0.1);
+    font-weight: 600;
+    color: #ffdde1;
+}
+
+.data-table tr:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Кнопки дій */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.edit-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #45a049;
+    color: white;
+    text-decoration: none;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #da190b;
+    color: white;
+}
+
+.danger-btn {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+.danger-btn:hover {
+    background-color: #ff1a1a;
+    color: white;
+}
+
+/* Статистика */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffdde1;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #ffffff;
+    font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    body {
+        padding: 10px 5px;
+    }
+
+    .wrapper {
+        width: 95%;
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .navigation-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .nav-button {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .data-table {
+        font-size: 12px;
+        overflow-x: auto;
+        display: block;
+        white-space: nowrap;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 8px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Форми всередині таблиць */
+.inline-form {
+    display: inline;
+}
+
+.inline-form button {
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+/* Пустий стан */
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #aeada8 0%, #271930 100%);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+    background: #9f9e9e;
+}

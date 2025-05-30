@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit User - Fitness Tracker</title>
+    <link rel="stylesheet" href="/style/editUser.css">
+</head>
+<body>
+<div class="wrapper">
+    <form th:action="@{'/web/admin/users/edit/' + ${user.id}}" method="post" th:object="${user}">
+        <h2>Edit User</h2>
+
+        <div th:if="${param.success}" class="message success-message" th:text="${param.success}"></div>
+        <div th:if="${param.error}" class="message error-message" th:text="${param.error}"></div>
+
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+        <div class="input-field">
+            <input type="text" th:field="*{username}" required />
+            <label>Username</label>
+        </div>
+
+        <div class="input-field">
+            <input type="email" th:field="*{email}" required />
+            <label>Email</label>
+        </div>
+
+        <div class="input-field fixed-label">
+            <select th:field="*{role}" required>
+                <option value="USER" th:selected="${user.role == 'USER'}">USER</option>
+                <option value="ADMIN" th:selected="${user.role == 'ADMIN'}">ADMIN</option>
+            </select>
+            <label>Role</label>
+        </div>
+
+        <div class="input-field">
+            <input type="password" name="password" />
+            <label>New Password (optional)</label>
+        </div>
+
+        <button type="submit">💾 Save Changes</button>
+    </form>
+
+        <form action="/web/admin" method="get" style="display: inline;">
+            <button type="submit">← Back to Admin Panel</button>
+        </form>
+
+
+    <div class="danger-zone">
+        <h3>⚠️ Danger Zone</h3>
+        <p><strong>Attention!</strong> Deleting the user will:</p>
+        <ul>
+            <li>Completely remove the user from the system</li>
+            <li>Delete all their workouts</li>
+            <li>Delete all their goals</li>
+            <li>This action is <strong>irreversible</strong>!</li>
+        </ul>
+        <form th:action="@{'/web/admin/users/' + ${user.id} + '/delete'}" method="post"
+              onsubmit="return confirm('Are you sure you want to delete the user? This action is irreversible!');">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <button type="submit">🗑️ Remove User Permanently</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
