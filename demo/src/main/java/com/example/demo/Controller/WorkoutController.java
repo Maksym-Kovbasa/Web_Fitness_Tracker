@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,19 +18,20 @@ import com.example.demo.Model.Workout;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.Repository.WorkoutRepository;
 import com.example.demo.Service.GoalServiceInterface;
+import com.example.demo.Service.WorkoutServiceInterface;
 
 @RestController
 @RequestMapping("/api/workouts")
 public class WorkoutController {
     private final WorkoutRepository workoutRepository;
     private final UserRepository userRepository;
-    private final GoalServiceInterface goalService;
+    private final WorkoutServiceInterface workoutService;
 
     public WorkoutController(WorkoutRepository workoutRepository, UserRepository userRepository,
-            GoalServiceInterface goalService) {
+            WorkoutServiceInterface workoutService) {
         this.workoutRepository = workoutRepository;
         this.userRepository = userRepository;
-        this.goalService = goalService;
+        this.workoutService = workoutService;
     }
 
     @GetMapping
@@ -102,73 +104,45 @@ public class WorkoutController {
 
     @PostMapping
     public ResponseEntity<?> createWorkout(@RequestBody Workout workout) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        validateWorkoutData(workout);
-        User user = userRepository.findByUsername(username).orElseThrow(() -> UserException.currentUserNotFound());
-        workout.setUser(user);
-        Workout saved = workoutRepository.save(workout);
-        goalService.updateAllGoalsProgressForUserAndDate(user, workout.getDate());
-        return ResponseEntity.ok(saved);
+
+        Workout savedWorkout = workoutService.createWorkout(workout);
+        return ResponseEntity.ok(savedWorkout);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateWorkout(@PathVariable Long id, @RequestBody Workout workout) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        User currentUser = userRepository.findByUsername(username)
-                .orElseThrow(() -> UserException.currentUserNotFound());
-
-        Optional<Workout> existingWorkoutOpt = workoutRepository.findById(id);
-        if (existingWorkoutOpt.isEmpty()) {
-            throw WorkoutException.workoutNotFound(id);
-        }
-        validateWorkoutData(workout);
-        Workout existingWorkout = existingWorkoutOpt.get();
-
-        if (existingWorkout.getUser() == null || !existingWorkout.getUser().getId().equals(currentUser.getId())) {
-            throw WorkoutException.workoutAccessDenied(id);
-        }
-        existingWorkout.setType(workout.getType());
-        existingWorkout.setDuration(workout.getDuration());
-        existingWorkout.setCalories(workout.getCalories());
-        existingWorkout.setDate(workout.getDate());
-        Workout updated = workoutRepository.save(existingWorkout);
-        goalService.updateAllGoalsProgressForUserAndDate(currentUser, updated.getDate());
-        return ResponseEntity.ok(updated);
+        String username = getCurrentUsername();
+        Workout updatedWorkout = workoutService.updateWorkout(id, workout, username);
+        return ResponseEntity.ok(updatedWorkout);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteWorkout(@PathVariable Long id) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        User currentUser = userRepository.findByUsername(username)
-                .orElseThrow(() -> UserException.currentUserNotFound());
+        String username = getCurrentUsername();        
+        User currentUser = getCurrentUser(username);
+        
         Optional<Workout> workoutOpt = workoutRepository.findById(id);
         if (workoutOpt.isEmpty()) {
             throw WorkoutException.workoutNotFound(id);
         }
+        
         Workout workout = workoutOpt.get();
         if (workout.getUser() == null || !workout.getUser().getId().equals(currentUser.getId())) {
             throw WorkoutException.workoutAccessDenied(id);
         }
+        
+        LocalDate workoutDate = workout.getDate();
+        
         workoutRepository.delete(workout);
-        goalService.updateAllGoalsProgressForUserAndDate(currentUser, workout.getDate());
         return ResponseEntity.ok("Workout deleted successfully.");
     }
 
-    private void validateWorkoutData(Workout workout) {
-        if (workout.getType() == null || workout.getType().isEmpty()) {
-            throw WorkoutException.invalidWorkoutData("type");
-        }
-        if (workout.getDuration() == null || workout.getDuration() <= 0) {
-            throw WorkoutException.invalidWorkoutData("duration");
-        }
-        if (workout.getCalories() == null || workout.getCalories() <= 0) {
-            throw WorkoutException.invalidWorkoutData("calories");
-        }
-        if (workout.getDate() == null) {
-            throw WorkoutException.invalidWorkoutData("date");
-        }
+    private String getCurrentUsername() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth.getName();
+    }
+    private User getCurrentUser(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> UserException.currentUserNotFound());
     }
 }

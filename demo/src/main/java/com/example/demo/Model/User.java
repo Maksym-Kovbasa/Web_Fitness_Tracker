@@ -32,7 +32,7 @@ public class User {
     private String username;
     private String email;
     private String role;
-    @JsonProperty(access = Access.WRITE_ONLY)
+    //@JsonProperty(access = Access.WRITE_ONLY)
     private String password;
 
     @OneToMany(mappedBy = "user")

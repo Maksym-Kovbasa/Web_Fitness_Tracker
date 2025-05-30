@@ -67,11 +67,7 @@ public class AdminRestController {
         existing.setUsername(user.getUsername());
         existing.setEmail(user.getEmail());
         existing.setRole(user.getRole());
-
-        if (user.getPassword() != null && !user.getPassword().isBlank()) {
         existing.setPassword(passwordEncoder.encode(user.getPassword()));
-        }
-
         validate(user);
         User savedUser = userRepository.save(existing);
         return ResponseEntity.ok(savedUser);
@@ -128,6 +124,7 @@ public class AdminRestController {
     @PutMapping("/goals/{id}")
     public ResponseEntity<Goal> updateGoal(@PathVariable Long id, @RequestBody Goal goal) {
         Goal existing = goalRepository.findById(id).orElseThrow(() -> GoalException.goalNotFound(id));
+        validateGoalData(existing);
         existing.setTargetCalories(goal.getTargetCalories());
         existing.setTargetWorkouts(goal.getTargetWorkouts());
         existing.setStartDate(goal.getStartDate());
@@ -258,11 +255,10 @@ public class AdminRestController {
         if (!isValidEmail(user.getEmail())) {
             throw UserException.invalidEmailFormat();
         }
-        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
-            throw UserException.passwordRequired();
-        }
-        if (user.getPassword().length() < 6) {
-            throw UserException.passwordTooShort();
+        if (user.getPassword() != null && !user.getPassword().trim().isEmpty()) {
+            if (user.getPassword().length() < 6) {
+                throw UserException.passwordTooShort();
+            }
         }
     }
 
@@ -281,6 +277,14 @@ public class AdminRestController {
         if (workout.getDate() == null) {
             throw WorkoutException.invalidWorkoutData("date");
         }
+    }
+
+     private void validateGoalData(Goal goal) {
+        if (goal.getTargetCalories() == null || goal.getTargetCalories() <= 0) { throw GoalException.invalidGoalData("targetCalories"); }
+        if (goal.getTargetWorkouts() == null || goal.getTargetWorkouts() <= 0) { throw GoalException.invalidGoalData("targetWorkouts"); }
+        if (goal.getStartDate() == null) { throw GoalException.invalidGoalData("startDate"); }
+        if (goal.getEndDate() == null) { throw GoalException.invalidGoalData("endDate"); }
+        if (goal.getEndDate().isBefore(goal.getStartDate())) { throw GoalException.goalDateConflict(); }
     }
 
 }
