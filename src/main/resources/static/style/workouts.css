@@ -93,18 +93,23 @@ body::before {
 
 .user-info span {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+}
+
+.user-info .actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
 .user-info form {
     display: inline;
-    margin-left: 10px;
 }
 
 .user-info:hover {
     box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
 }
-
 
 .list-workouts h2 {
     font-size: 2rem;
@@ -121,15 +126,10 @@ body::before {
     -webkit-backdrop-filter: blur(20px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    padding: 15px;
+    padding: 20px;
     margin: 10px 0;
-    min-width: none;
     font-size: 1.4rem;
-    border-radius: 8px;
-    grid-column: 1 / -1;
-    justify-self: center;
-    align-self: center;
-    max-width: 300px;
+    border-radius: 15px;
     width: 100%;
 }
 
@@ -138,7 +138,7 @@ body::before {
 }
 
 .add-workout h3 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     margin-bottom: 25px;
     color: #ffffff;
     letter-spacing: 1px;
@@ -146,11 +146,10 @@ body::before {
 }
 
 .add-workout form {
-    display: grid;
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
     text-align: center;
-    justify-self: center;
-    align-self: center;
 }
 
 .add-workout input {
@@ -225,6 +224,25 @@ tr:hover td {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+button {
+    background-color: #271930;
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    padding: 15px 20px;
+    cursor: pointer;
+    border-radius: 25px;
+    font-size: 16px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    color: #000000;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #ffffff;
+}
+
 .error {
     color: #721c24;
     background-color: rgba(248, 215, 218, 0.9);
@@ -245,80 +263,324 @@ tr:hover td {
     text-align: center;
 }
 
-@media (max-width: 1200px) {
-    .wrapper {
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .user-info {
-        position: relative;
-        width: 100%;
-        margin: 0;
-        left: 0;
-        top: 0;
-    }
-
-    .add-workout {
-        order: -1;
-    }
-}
-
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
-
-    .wrapper {
-        padding-top: 20px;
-    }
-
-    .user-info {
-        width: 100%;
-        margin-left: 0;
-    }
-
-    .list-workouts,
-    .add-workout {
-        padding: 20px;
-    }
-
-    table {
-        font-size: 14px;
-    }
-
-    th,
-    td {
-        padding: 8px;
-    }
-}
-
-button {
-    background-color: #271930;
-    color: #ffffff;
-    font-weight: 600;
-    border: none;
-    padding: 15px 20px;
-    cursor: pointer;
-    border-radius: 25px;
-    font-size: 16px;
-    border: 2px solid transparent;
-    transition: all 0.3s ease;
-}
-
-button:hover {
-    color: #000000;
-    background: rgba(255, 255, 255, 0.2);
-    border-color: #ffffff;
-}
-
 ::-webkit-scrollbar {
     width: 8px;
 }
+
 ::-webkit-scrollbar-thumb {
     background: linear-gradient(135deg, #aeada8 0%, #271930 100%);
     border-radius: 4px;
 }
+
 ::-webkit-scrollbar-track {
     background: #9f9e9e;
+}
+
+/* Додаткові стилі для великих екранів (більше 1431px) */
+@media (min-width: 1431px) {
+    body {
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 20px;
+        gap: 0;
+    }
+
+    .user-info {
+        position: fixed;
+        top: 20px;
+        left: 50px;
+        width: 400px;
+        margin-left: 0;
+        transform: none;
+    }
+
+    .wrapper {
+        position: fixed;
+        left: 50px;
+        top: 60%;
+        transform: translateY(-50%);
+        width: 400px;
+        margin-left: 0;
+        margin-top: 0;
+    }
+
+    .wrapper-list {
+        position: static;
+        margin-left: 500px;
+        margin-top: 20px;
+        margin-right: 50px;
+        width: calc(100% - 550px);
+        max-width: none;
+    }
+
+    .add-workout {
+        padding: 25px;
+    }
+
+    .add-workout h3 {
+        font-size: 2rem;
+    }
+}
+
+/* Основні медіа-запити для пристроїв менше 1431px */
+@media (max-width: 1430px) {
+    body {
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 10px;
+        padding-top: 100px;
+        gap: 20px;
+    }
+
+    .user-info {
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 20px);
+        max-width: 500px;
+        margin-left: 0;
+        z-index: 1001;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .user-info .actions {
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .user-info .actions button {
+        flex: 1;
+        min-width: 100px;
+        max-width: 150px;
+    }
+
+    .wrapper {
+        position: relative !important;
+        transform: none !important;
+        left: auto !important;
+        top: auto !important;
+        margin-top: 10%;
+        width: 100%;
+        max-width: 500px;
+        padding: 30px;
+        z-index: auto;
+        margin-left: 0;
+    }
+
+    .wrapper-list {
+        position: relative !important;
+        margin: 0 auto !important;
+        margin-top: 10%;
+        width: 100%;
+        max-width: 900px;
+        min-height: auto;
+        padding: 25px;
+    }
+
+    .add-workout {
+        max-width: 100%;
+        padding: 25px;
+    }
+
+    table {
+        font-size: 14px;
+        width: 100%;
+        overflow-x: auto;
+        display: block;
+        white-space: nowrap;
+    }
+
+    table thead,
+    table tbody,
+    table tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+}
+
+/* Медіа-запити для планшетів (768px - 1023px) */
+@media (max-width: 1023px) {
+    .user-info {
+        max-width: 600px;
+        padding: 20px;
+    }
+
+    .wrapper {
+        max-width: 600px;
+        padding: 35px;
+    }
+
+    .wrapper-list {
+        max-width: 800px;
+        padding: 30px;
+    }
+
+    .list-workouts h2 {
+        font-size: 1.8rem;
+    }
+
+    .add-workout h3 {
+        font-size: 1.6rem;
+    }
+}
+
+/* Медіа-запити для мобільних пристроїв (до 768px) */
+@media (max-width: 768px) {
+    body {
+        padding: 8px;
+        padding-top: 90px;
+        gap: 15px;
+    }
+
+    .user-info {
+        top: 8px;
+        width: calc(100% - 16px);
+        max-width: 400px;
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+
+    .user-info .actions {
+        gap: 8px;
+    }
+
+    .user-info .actions button {
+        padding: 8px 12px;
+        font-size: 14px;
+        min-width: 85px;
+        max-width: 120px;
+    }
+
+    .wrapper {
+        max-width: 400px;
+        padding: 25px;
+    }
+
+    .wrapper-list {
+        margin-top: 5%;
+        max-width: 600px;
+        padding: 20px;
+    }
+
+    .add-workout {
+        padding: 20px;
+    }
+
+    .add-workout h3 {
+        font-size: 1.4rem;
+        margin-bottom: 20px;
+    }
+
+    .list-workouts h2 {
+        font-size: 1.6rem;
+        margin-bottom: 20px;
+    }
+
+    .add-workout input {
+        height: 40px;
+        font-size: 15px;
+    }
+
+    button {
+        padding: 12px 16px;
+        font-size: 15px;
+    }
+
+    table {
+        font-size: 12px;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    th,
+    td {
+        padding: 8px 6px;
+        min-width: 80px;
+    }
+
+    .btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}
+
+/* Медіа-запити для дуже маленьких екранів (до 480px) */
+@media (max-width: 480px) {
+    body {
+        padding: 5px;
+        padding-top: 85px;
+        gap: 12px;
+    }
+
+    .user-info {
+        top: 5px;
+        width: calc(100% - 10px);
+        max-width: 350px;
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+
+    .user-info .actions button {
+        padding: 6px 10px;
+        font-size: 12px;
+        min-width: 70px;
+        max-width: 100px;
+    }
+
+    .wrapper {
+        max-width: 350px;
+        padding: 20px;
+    }
+
+    .wrapper-list {
+        max-width: 500px;
+        padding: 15px;
+    }
+
+    .add-workout {
+        padding: 15px;
+    }
+
+    .add-workout h3 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+
+    .list-workouts h2 {
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+    }
+
+    .add-workout input {
+        height: 35px;
+        font-size: 14px;
+    }
+
+    button {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    table {
+        font-size: 11px;
+    }
+
+    th,
+    td {
+        padding: 6px 4px;
+        min-width: 70px;
+    }
+
+    .btn {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
 }
