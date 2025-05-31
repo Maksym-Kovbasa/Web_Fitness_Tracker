@@ -255,6 +255,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🔗 References
 
+- [Link to the application](https://web-fitness-tracker-production.up.railway.app/)
 - [Spring Boot Documentation](https://docs.spring.io/spring-boot/)
 - [Spring Security Guide](https://spring.io/guides/gs/securing-web/)
 - [Thymeleaf Documentation](https://www.thymeleaf.org/documentation.html)
