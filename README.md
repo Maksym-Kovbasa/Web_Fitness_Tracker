@@ -46,25 +46,21 @@ A comprehensive web-based fitness tracking application built with Spring Boot th
 git clone https://github.com/Maksym-Kovbasa/Web_Fitness_Tracker.git
 ```
 
-2. **Navigate to project directory**
-```bash
-cd Web_Fitness_Tracker
-```
 
-3. **Configure database settings**
+4. **Configure database settings**
    - Update `application.properties` with your database credentials
 
-4. **Build the project**
+5. **Build the project**
 ```bash
 mvn clean install
 ```
 
-5. **Run the application**
+6. **Run the application**
 ```bash
 mvn spring-boot:run
 ```
 
-6. **Access the application**
+7. **Access the application**
    - Open browser and go to `http://localhost:8080`
 
 ## 📁 Project Structure
