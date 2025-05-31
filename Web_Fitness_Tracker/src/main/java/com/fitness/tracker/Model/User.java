@@ -3,7 +3,6 @@ package com.fitness.tracker.Model;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fitness.tracker.Model.Workout;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

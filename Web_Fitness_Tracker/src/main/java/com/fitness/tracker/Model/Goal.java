@@ -3,7 +3,6 @@ package com.fitness.tracker.Model;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fitness.tracker.Model.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
